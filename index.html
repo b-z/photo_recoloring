@@ -59,7 +59,7 @@
 
 				<div class="row source_image_area">
 					<div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4">
-						<canvas class="materialboxed" id="source_image"></canvas>
+						<canvas class="materialboxed z-depth-1" id="source_image"></canvas>
 					</div>
 				</div>
 			</div>
@@ -94,7 +94,6 @@
 			reader.onload = putImage2Canvas;
 			reader.readAsDataURL(file);
 			$('.source_image_area').show();
-			palette();
 		}
 
 		function putImage2Canvas(event) {
@@ -106,7 +105,10 @@
 				height = canv.height = img.height;
 				ctx = canv.getContext('2d');
 				ctx.drawImage(img, 0, 0);
-				img_raw = context.getImageData(0, 0, img.width, img.height);
+				img_raw = ctx.getImageData(0, 0, img.width, img.height);
+
+				Palette.init(img_raw);
+				Palette.palette(img_raw.data);
 			}
 		}
 
