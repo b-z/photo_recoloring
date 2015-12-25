@@ -138,8 +138,12 @@
 					return function(){
 						$('.plt'+j).attr('style','background-color:'+cl+'!important');
 					};
-				})(i,color),500*i);
+				})(i,color),500*(1+i));
 			}
+			setTimeout(function(){
+				$('#palette').append('<div id="helper" class="col s12 center-align" style="display:none;"><h5>Click the palette to edit.</h5></div>');
+				$('#helper').fadeIn(1000);
+			},3500);
 		}
 
 		$('#file_path')[0].onchange = uploadFile;
