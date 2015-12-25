@@ -58,8 +58,27 @@
 				<h6 class="source_image_area">THE IMAGE</h6>
 
 				<div class="row source_image_area">
-					<div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4">
+					<div class="col s8 m8 l8 offset-s2 offset-m2 offset-l2">
 						<canvas class="materialboxed z-depth-1" id="source_image"></canvas>
+					</div>
+				</div>
+
+				<div id="palette" class="row source_image_area">
+					<div class="col s2 m2 l2 offset-s2 offset-m2 offset-l2 center-align">
+						<a class="plt0 btn-floating btn waves-effect waves-light hide-on-med-and-up"></a>
+						<a class="plt0 btn-floating btn-large waves-effect waves-light hide-on-small-only"></a>
+					</div>
+					<div class="col s2 m2 l2 center-align">
+						<a class="plt1 btn-floating btn waves-effect waves-light hide-on-med-and-up"></a>
+						<a class="plt1 btn-floating btn-large waves-effect waves-light hide-on-small-only"></a>
+					</div>
+					<div class="col s2 m2 l2 center-align">
+						<a class="plt2 btn-floating btn waves-effect waves-light hide-on-med-and-up"></a>
+						<a class="plt2 btn-floating btn-large waves-effect waves-light hide-on-small-only"></a>
+					</div>
+					<div class="col s2 m2 l2 center-align">
+						<a class="plt3 btn-floating btn waves-effect waves-light hide-on-med-and-up"></a>
+						<a class="plt3 btn-floating btn-large waves-effect waves-light hide-on-small-only"></a>
 					</div>
 				</div>
 			</div>
@@ -109,6 +128,7 @@
 
 				Palette.init(img_raw);
 				Palette.palette(img_raw.data);
+
 			}
 		}
 
