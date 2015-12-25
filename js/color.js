@@ -1,3 +1,7 @@
+/**
+ * @author Zhou Bowei
+ */
+
 var Color = {
     rgb2lab: function(inputColor) {
         var RGB = [0, 0, 0];
@@ -11,7 +15,7 @@ var Color = {
             RGB[i] = 100 * v;
         }
 
-        console.log(RGB);
+        // console.log(RGB);
         var X = RGB[0] * 0.4124 + RGB[1] * 0.3576 + RGB[2] * 0.1805;
         var Y = RGB[0] * 0.2126 + RGB[1] * 0.7152 + RGB[2] * 0.0722;
         var Z = RGB[0] * 0.0193 + RGB[1] * 0.1192 + RGB[2] * 0.9505;
@@ -59,18 +63,18 @@ var Color = {
         var G = (-0.9689) * X + 1.8758 * Y + 0.0415 * Z;
         var B = 0.0557 * X + (-0.2040) * Y + 1.0570 * Z;
 
-        var RGB=[R,G,B];
-        console.log(RGB);
-        for (var i=0;i<3;i++){
-            var v=RGB[i]/100;
-            if (v>0.0405/12.92){
-                v=Math.pow(v,1/2.4);
-                v*=1.055;
-                v-=0.055;
-            }else{
-                v*=12.92;
+        var RGB = [R, G, B];
+        // console.log(RGB);
+        for (var i = 0; i < 3; i++) {
+            var v = RGB[i] / 100;
+            if (v > 0.0405 / 12.92) {
+                v = Math.pow(v, 1 / 2.4);
+                v *= 1.055;
+                v -= 0.055;
+            } else {
+                v *= 12.92;
             }
-            RGB[i]=Math.round(v*255);
+            RGB[i] = Math.round(v * 255);
         }
 
         return RGB;

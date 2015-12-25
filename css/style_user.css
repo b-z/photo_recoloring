@@ -42,9 +42,10 @@ nav, .brand-logo {
 .btn {
     margin: 2px;
 }
-.btn, .btn-large {
+.btn, .btn-large, .btn-small {
     background-color: #86A8A8!important;
     color: white !important;
+    margin: 0;
 }
 a {
     color: #88AAA9!important;
@@ -66,4 +67,11 @@ canvas {
 }
 main {
     flex: 1 0 auto;
+}
+.s1_5{
+    width:13.33333333333333333%
+}
+.btn-thin{
+    width:100%;
+    padding:0;
 }

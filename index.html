@@ -15,9 +15,9 @@
 		<nav>
 			<div class="nav-wrapper">
 				<div class="container">
-					<span class="brand-logo">PHOTO RECOLORING</span>
+					<span href="https://github.com/b-z/photo_recoloring" class="brand-logo">PHOTO RECOLORING</span>
 					<ul id="nav-mobile" class="right hide-on-small-only">
-						<li><a href="">ZHOU BOWEI</a></li>
+						<li><a href="https://github.com/b-z/photo_recoloring">ZHOU BOWEI</a></li>
 					</ul>
 				</div>
 			</div>
@@ -59,27 +59,12 @@
 
 				<div class="row source_image_area">
 					<div class="col s8 m8 l8 offset-s2 offset-m2 offset-l2">
-						<canvas class="materialboxed z-depth-1" id="source_image"></canvas>
+						<canvas class="materialboxed z-depth-2" id="source_image"></canvas>
 					</div>
 				</div>
 
 				<div id="palette" class="row source_image_area">
-					<div class="col s2 m2 l2 offset-s2 offset-m2 offset-l2 center-align">
-						<a class="plt0 btn-floating btn waves-effect waves-light hide-on-med-and-up"></a>
-						<a class="plt0 btn-floating btn-large waves-effect waves-light hide-on-small-only"></a>
-					</div>
-					<div class="col s2 m2 l2 center-align">
-						<a class="plt1 btn-floating btn waves-effect waves-light hide-on-med-and-up"></a>
-						<a class="plt1 btn-floating btn-large waves-effect waves-light hide-on-small-only"></a>
-					</div>
-					<div class="col s2 m2 l2 center-align">
-						<a class="plt2 btn-floating btn waves-effect waves-light hide-on-med-and-up"></a>
-						<a class="plt2 btn-floating btn-large waves-effect waves-light hide-on-small-only"></a>
-					</div>
-					<div class="col s2 m2 l2 center-align">
-						<a class="plt3 btn-floating btn waves-effect waves-light hide-on-med-and-up"></a>
-						<a class="plt3 btn-floating btn-large waves-effect waves-light hide-on-small-only"></a>
-					</div>
+
 				</div>
 			</div>
 		</div>
@@ -128,7 +113,30 @@
 
 				Palette.init(img_raw);
 				Palette.palette(img_raw.data);
+				var colors=Palette.kmeansFirst();
+				addPalette(colors);
+			}
+		}
 
+		function addPalette(colors){
+			var tmp='';
+			for (var i=1;i<colors.length;i++){
+				tmp+='\
+				<div class="col s1_5'+(i==1?' offset-s2 offset-m2 offset-l2':' ')+' center-align">\
+					<a class="plt'+i+' z-depth-2 btn-thin btn waves-effect waves-light hide-on-med-and-up"></a>\
+					<a class="plt'+i+' z-depth-2 btn-floating btn waves-effect waves-light hide-on-small-only hide-on-large-only"></a>\
+					<a class="plt'+i+' z-depth-2 btn-floating btn-large waves-effect waves-light hide-on-med-and-down"></a>\
+				</div>';
+			}
+			$('#palette').html(tmp);
+			for (var i=1;i<colors.length;i++){
+				var c=colors[i];
+				var color='rgb('+c[0]+','+c[1]+','+c[2]+')';
+				setTimeout((function(j,cl){
+					return function(){
+						$('.plt'+j).attr('style','background-color:'+cl+'!important');
+					};
+				})(i,color),500*i);
 			}
 		}
 
