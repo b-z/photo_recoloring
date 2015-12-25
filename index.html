@@ -37,7 +37,7 @@
 
 			<!-- search -->
 			<div id="search" class="section">
-				<h6 class="row">UPLOAD FILE</h6>
+				<h5 class="row">UPLOAD FILE</h5>
 
 				<div class="row">
 					<div class="col s12 m8 l8 offset-m2 offset-l2">
@@ -57,7 +57,7 @@
 					</div>
 				</div>
 
-				<h6 class="row source_image_area">THE IMAGE</h6>
+				<h5 class="row source_image_area">THE IMAGE</h5>
 
 				<div class="row source_image_area">
 					<div class="col s12 m8 l8 offset-m2 offset-l2">
@@ -93,7 +93,7 @@
 		});
 
 		function uploadFile(e) {
-			Materialize.toast('PROCESSING...', 2000);
+			Materialize.toast('PROCESSING...', 200);
 			var file = e.target.files[0];
 			var filename = file.name;
 			var reader = new FileReader();
@@ -138,7 +138,7 @@
 					return function(){
 						$('.plt'+j).attr('style','background-color:'+cl+'!important');
 					};
-				})(i,color),800*(0+i));
+				})(i,color),800*(0.5+i));
 			}
 			setTimeout(function(){
 				$('#palette').append('<div id="helper" class="col s12 center-align" style="display:none;"><h5>CLICK THE PALETTE TO RECOLOR.</h5></div>');
