@@ -93,7 +93,7 @@
 		});
 
 		function uploadFile(e) {
-			Materialize.toast('UPLOADING...', 2000);
+			Materialize.toast('PROCESSING...', 2000);
 			var file = e.target.files[0];
 			var filename = file.name;
 			var reader = new FileReader();
@@ -116,7 +116,7 @@
 				Palette.palette(img_raw.data);
 				var colors=Palette.kmeansFirst();
 				addPalette(colors);
-				$('.source_image_area').show();
+				$('.source_image_area').fadeIn(1000);
 			}
 		}
 
@@ -138,12 +138,12 @@
 					return function(){
 						$('.plt'+j).attr('style','background-color:'+cl+'!important');
 					};
-				})(i,color),500*(1+i));
+				})(i,color),800*(0+i));
 			}
 			setTimeout(function(){
-				$('#palette').append('<div id="helper" class="col s12 center-align" style="display:none;"><h5>Click the palette to edit.</h5></div>');
+				$('#palette').append('<div id="helper" class="col s12 center-align" style="display:none;"><h5>CLICK THE PALETTE TO RECOLOR.</h5></div>');
 				$('#helper').fadeIn(1000);
-			},3500);
+			},3000);
 		}
 
 		$('#file_path')[0].onchange = uploadFile;
