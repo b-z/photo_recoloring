@@ -3,80 +3,8 @@
 
 <head>
 	<title>Photo Recoloring by Zhou Bowei</title>
-	<style>
-		@font-face {
-			font-family: 'Material Icons';
-			font-style: normal;
-			font-weight: 400;
-			src: local('Material Icons'), local('MaterialIcons-Regular'), url(font/material-design-icons/1.woff2) format('woff2');
-		}
-
-		@font-face {
-			font-family: 'Abel';
-			font-style: normal;
-			font-weight: 400;
-			src: local('Abel'), local('Abel-Regular'), url(http://fonts.gstatic.com/s/abel/v6/UzN-iejR1VoXU2Oc-7LsbvesZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
-			unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
-		}
-
-		.material-icons {
-			font-family: 'Material Icons';
-			font-weight: normal;
-			font-style: normal;
-			font-size: 24px;
-			line-height: 1;
-			letter-spacing: normal;
-			text-transform: none;
-			display: inline-block;
-			word-wrap: normal;
-			-webkit-font-feature-settings: 'liga';
-			-webkit-font-smoothing: antialiased;
-		}
-
-		body {
-			background-color: #F6F4F1!important;
-			margin: 0;
-		}
-
-		body,
-		html {
-			font-family: 'Abel', sans-serif;
-			color: #846C63;
-		}
-
-		nav,
-		.brand-logo {
-			background-color: #ffffff!important;
-			color: #846C63!important;
-		}
-
-		.btn {
-			margin: 2px;
-		}
-
-		.btn,
-		.btn-large {
-			background-color: #86A8A8!important;
-			color: white !important;
-		}
-
-		a {
-			color: #88AAA9!important;
-		}
-
-		#results {
-			display: none;
-		}
-
-		canvas {
-			width: 100%;
-		}
-
-		#source_image_area {
-			display: none;
-		}
-	</style>
 	<link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+	<link type="text/css" rel="stylesheet" href="css/style_user.css"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
@@ -86,13 +14,16 @@
 		<div class="nav-wrapper">
 			<div class="container">
 				<span class="brand-logo">PHOTO RECOLORING</span>
-				<ul id="nav-mobile" class="right hide-on-med-and-down">
+				<ul id="nav-mobile" class="right hide-on-small">
 					<li><a href="">ZHOU BOWEI</a></li>
 				</ul>
 			</div>
 		</div>
 	</nav>
 	<!-- nav bar end -->
+	<a href="https://github.com/b-z/photo_recoloring" class="hide-on-med-and-down">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
+    </a>
 	<!-- container -->
 	<div class="container">
 
@@ -143,7 +74,7 @@
 		<!-- footer end -->
 		<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 		<script type="text/javascript" src="js/materialize.min.js"></script>
-		<script type="text/javascript" src="js/result.js"></script>
+		<script type="text/javascript" src="js/color.js"></script>
 		<script>
 			var result_lst = {};
 			var img_path = 'tsinghua_landmark/';

@@ -1,0 +1,71 @@
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Material Icons'), local('MaterialIcons-Regular'), url(font/material-design-icons/1.woff2) format('woff2');
+}
+
+@font-face {
+    font-family: 'Abel';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Abel'), local('Abel-Regular'), url(font/material-design-icons/2.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    word-wrap: normal;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: #F6F4F1!important;
+    margin: 0;
+}
+
+body,
+html {
+    font-family: 'Abel', sans-serif;
+    color: #846C63;
+}
+
+nav,
+.brand-logo {
+    background-color: #ffffff!important;
+    color: #846C63!important;
+}
+
+.btn {
+    margin: 2px;
+}
+
+.btn,
+.btn-large {
+    background-color: #86A8A8!important;
+    color: white !important;
+}
+
+a {
+    color: #88AAA9!important;
+}
+
+#results {
+    display: none;
+}
+
+canvas {
+    width: 100%;
+}
+
+#source_image_area {
+    display: none;
+}
