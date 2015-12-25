@@ -1,0 +1,3 @@
+var palette=function(dataArray){
+
+}

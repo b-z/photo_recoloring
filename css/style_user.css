@@ -66,6 +66,6 @@ canvas {
     width: 100%;
 }
 
-#source_image_area {
+.source_image_area {
     display: none;
 }
