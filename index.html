@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>Photo Recoloring by Zhou Bowei</title>
+	<title>Photo Recoloring Tool by Zhou Bowei</title>
 	<link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
 	<link type="text/css" rel="stylesheet" href="css/style_user.css"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,11 +30,7 @@
 		<!-- search -->
 		<div id="search" class="section">
 			<h6>UPLOAD FILE</h6>
-			<div id="source_image_area" class="row">
-				<div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4">
-					<canvas id="source_image"></canvas>
-				</div>
-			</div>
+
 			<div class="row">
 				<div class="col s12 m8 l8 offset-m2 offset-l2">
 					<form action="#">
@@ -52,13 +48,19 @@
 					</form>
 				</div>
 			</div>
+
+			<div id="source_image_area" class="row">
+				<div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4">
+					<canvas class="materialboxed" id="source_image"></canvas>
+				</div>
+			</div>
 		</div>
 		<!-- search result -->
-		<div id="results" class="section">
+		<!-- <div id="results" class="section">
 			<h6>RESULTS</h6>
 			<div class="row">
 				<div id="results_area">
-					<!-- # -->
+
 					<div class="results_col col s12 m4 l4">
 					</div>
 					<div class="results_col col s12 m4 l4">
@@ -67,7 +69,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<!-- container end -->
 
 		<!-- footer -->
@@ -75,45 +77,14 @@
 		<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 		<script type="text/javascript" src="js/materialize.min.js"></script>
 		<script type="text/javascript" src="js/color.js"></script>
+		<script type="text/javascript" src="js/palette.js"></script>
 		<script>
-			var result_lst = {};
-			var img_path = 'tsinghua_landmark/';
-
-			var canv, file;
+			var canv, file, ctx;
+			var img_raw;
 			$(document).ready(function() {
 				$('.materialboxed').materialbox();
 				$('.modal-trigger').leanModal();
 			});
-
-			function addResult(links) {
-				if (!links.length) {
-					return;
-				}
-				var link = links[0];
-				var title = link.split(/[/\\]/);
-				title = title[title.length - 1];
-				title = title.split('.')[0];
-				var text =
-					'<div class="card">\
-						<div class="card-image waves-effect waves-block waves-light">\
-							<img src="' + link + '" id="img' + links.length + '">\
-							<span class="card-title">' + title + '</span>\
-						</div>\
-					</div>';
-				var m = Infinity,
-					mt = 0;
-				for (j = 0; j < 3; j++) {
-					var h = $($('.results_col')[j]).height();
-					if (h < m) {
-						m = h;
-						mt = j;
-					}
-				}
-				$('.results_col')[mt].innerHTML += text;
-				$('#img' + links.length).load(function() {
-					addResult(links.slice(1))
-				});
-			}
 
 			function uploadFile(e) {
 				Materialize.toast('UPLOADING...', 2000);
@@ -123,16 +94,7 @@
 				reader.onload = putImage2Canvas;
 				reader.readAsDataURL(file);
 				$('#source_image_area').show();
-				search(filename, function(data) {
-					if (data.status == 'success') {
-						$('.results_col').html('');
-						addResult(data.paths);
-						$('#results').show();
-						Materialize.toast('SEARCH SUCCESS', 2000);
-					} else {
-						Materialize.toast('SEARCH FAIL', 2000);
-					}
-				});
+				palette()
 			}
 
 			function putImage2Canvas(event) {
@@ -142,58 +104,14 @@
 					var canv = $('#source_image')[0];
 					canv.width = img.width;
 					canv.height = img.height;
-					var context = canv.getContext('2d');
-					context.drawImage(img, 0, 0);
-					// var imgdata = context.getImageData(0, 0, img.width, img.height);
-				}
-			}
-
-			function search(filename, ret) {
-				filename=filename.split('.')[0];
-				var result = {};
-				if (result_lst[filename]!=undefined){
-					result.status = 'success';
-					result.paths=[];
-					var lst=result_lst[filename];
-					for (var i=0;i<lst.length;i++){
-						result.paths.push(img_path+lst[i].fname);
-					}
-				}else{
-					result.status = 'fail';
-				}
-
-				ret(result);
-			}
-
-			function parseResult() {
-				var tmp=result_txt.split('\n');
-				i=0;
-				while (i<tmp.length){
-					var line=tmp[i];
-					if (!line.length){
-						i++;
-						continue;
-					}
-					line=line.split(' ');
-					var fname=line[1];
-					if (fname.indexOf('.')==-1){
-						result_lst[fname]=[];
-						for (j=0;j<line[2]-0;j++){
-							i++;
-							_line=tmp[i].split(' ');
-							result_lst[fname].push({
-								id:_line[0]-0,
-								fname:_line[1],
-								score:_line[2]-0
-							});
-						}
-					}
-					i++;
+					ctx = canv.getContext('2d');
+					ctx.drawImage(img, 0, 0);
+					var imgdata = context.getImageData(0, 0, img.width, img.height);
 				}
 			}
 
 			$('#file_path')[0].onchange = uploadFile;
-			parseResult();
+
 		</script>
 </body>
 
