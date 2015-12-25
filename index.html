@@ -99,7 +99,6 @@
 			var reader = new FileReader();
 			reader.onload = putImage2Canvas;
 			reader.readAsDataURL(file);
-			$('.source_image_area').show();
 		}
 
 		function putImage2Canvas(event) {
@@ -117,6 +116,7 @@
 				Palette.palette(img_raw.data);
 				var colors=Palette.kmeansFirst();
 				addPalette(colors);
+				$('.source_image_area').show();
 			}
 		}
 
