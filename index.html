@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Image Retrieval</title>
+	<style>
+		@font-face {
+			font-family: 'Material Icons';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Material Icons'), local('MaterialIcons-Regular'), url(font/material-design-icons/1.woff2) format('woff2');
+		}
+
+		@font-face {
+			font-family: 'Abel';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Abel'), local('Abel-Regular'), url(http://fonts.gstatic.com/s/abel/v6/UzN-iejR1VoXU2Oc-7LsbvesZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
+			unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+		}
+
+		.material-icons {
+			font-family: 'Material Icons';
+			font-weight: normal;
+			font-style: normal;
+			font-size: 24px;
+			line-height: 1;
+			letter-spacing: normal;
+			text-transform: none;
+			display: inline-block;
+			word-wrap: normal;
+			-webkit-font-feature-settings: 'liga';
+			-webkit-font-smoothing: antialiased;
+		}
+
+		body {
+			background-color: #F6F4F1!important;
+			margin: 0;
+		}
+
+		body,
+		html {
+			font-family: 'Abel', sans-serif;
+			color: #846C63;
+		}
+
+		nav,
+		.brand-logo {
+			background-color: #ffffff!important;
+			color: #846C63!important;
+		}
+
+		.btn {
+			margin: 2px;
+		}
+
+		.btn,
+		.btn-large {
+			background-color: #86A8A8!important;
+			color: white !important;
+		}
+
+		a {
+			color: #88AAA9!important;
+		}
+
+		#results {
+			display: none;
+		}
+
+		canvas {
+			width: 100%;
+		}
+
+		#source_image_area {
+			display: none;
+		}
+	</style>
+	<link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+	<!-- nav bar -->
+	<nav>
+		<div class="nav-wrapper">
+			<div class="container">
+				<span class="brand-logo">IMAGE RETRIEVAL</span>
+				<ul id="nav-mobile" class="right hide-on-med-and-down">
+					<li><a href="">GENG ZHENGLIN</a></li>
+					<li><a href="">WANG YUWEI</a></li>
+					<li><a href="">ZHOU BOWEI</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- nav bar end -->
+	<!-- container -->
+	<div class="container">
+
+		<!-- search -->
+		<div id="search" class="section">
+			<h6>SEARCH</h6>
+			<div id="source_image_area" class="row">
+				<div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4">
+					<canvas id="source_image"></canvas>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col s12 m8 l8 offset-m2 offset-l2">
+					<form action="#">
+						<div class="file-field input-field">
+							<div class="btn">
+								<input id="file_path" type="file">
+								<span><i class="material-icons">search</i></span>
+							</div>
+
+							<div class="file-path-wrapper">
+								<input class="file-path validate" type="text" placeholder="UPLOAD IMAGE FILE">
+							</div>
+
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!-- search result -->
+		<div id="results" class="section">
+			<h6>RESULTS</h6>
+			<div class="row">
+				<div id="results_area">
+					<!-- # -->
+					<div class="results_col col s12 m4 l4">
+					</div>
+					<div class="results_col col s12 m4 l4">
+					</div>
+					<div class="results_col col s12 m4 l4">
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- container end -->
+
+		<!-- footer -->
+		<!-- footer end -->
+		<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
+		<script type="text/javascript" src="js/materialize.min.js"></script>
+		<script type="text/javascript" src="js/result.js"></script>
+		<script>
+			var result_lst = {};
+			var img_path = 'tsinghua_landmark/';
+
+			var canv, file;
+			$(document).ready(function() {
+				$('.materialboxed').materialbox();
+				$('.modal-trigger').leanModal();
+			});
+
+			function addResult(links) {
+				if (!links.length) {
+					return;
+				}
+				var link = links[0];
+				var title = link.split(/[/\\]/);
+				title = title[title.length - 1];
+				title = title.split('.')[0];
+				var text =
+					'<div class="card">\
+						<div class="card-image waves-effect waves-block waves-light">\
+							<img src="' + link + '" id="img' + links.length + '">\
+							<span class="card-title">' + title + '</span>\
+						</div>\
+					</div>';
+				var m = Infinity,
+					mt = 0;
+				for (j = 0; j < 3; j++) {
+					var h = $($('.results_col')[j]).height();
+					if (h < m) {
+						m = h;
+						mt = j;
+					}
+				}
+				$('.results_col')[mt].innerHTML += text;
+				$('#img' + links.length).load(function() {
+					addResult(links.slice(1))
+				});
+			}
+
+			function uploadFile(e) {
+				Materialize.toast('UPLOADING...', 2000);
+				var file = e.target.files[0];
+				var filename = file.name;
+				var reader = new FileReader();
+				reader.onload = putImage2Canvas;
+				reader.readAsDataURL(file);
+				$('#source_image_area').show();
+				search(filename, function(data) {
+					if (data.status == 'success') {
+						$('.results_col').html('');
+						addResult(data.paths);
+						$('#results').show();
+						Materialize.toast('SEARCH SUCCESS', 2000);
+					} else {
+						Materialize.toast('SEARCH FAIL', 2000);
+					}
+				});
+			}
+
+			function putImage2Canvas(event) {
+				var img = new Image();
+				img.src = event.target.result;
+				img.onload = function() {
+					var canv = $('#source_image')[0];
+					canv.width = img.width;
+					canv.height = img.height;
+					var context = canv.getContext('2d');
+					context.drawImage(img, 0, 0);
+					// var imgdata = context.getImageData(0, 0, img.width, img.height);
+				}
+			}
+
+			function search(filename, ret) {
+				filename=filename.split('.')[0];
+				var result = {};
+				if (result_lst[filename]!=undefined){
+					result.status = 'success';
+					result.paths=[];
+					var lst=result_lst[filename];
+					for (var i=0;i<lst.length;i++){
+						result.paths.push(img_path+lst[i].fname);
+					}
+				}else{
+					result.status = 'fail';
+				}
+
+				ret(result);
+			}
+
+			function parseResult() {
+				var tmp=result_txt.split('\n');
+				i=0;
+				while (i<tmp.length){
+					var line=tmp[i];
+					if (!line.length){
+						i++;
+						continue;
+					}
+					line=line.split(' ');
+					var fname=line[1];
+					if (fname.indexOf('.')==-1){
+						result_lst[fname]=[];
+						for (j=0;j<line[2]-0;j++){
+							i++;
+							_line=tmp[i].split(' ');
+							result_lst[fname].push({
+								id:_line[0]-0,
+								fname:_line[1],
+								score:_line[2]-0
+							});
+						}
+					}
+					i++;
+				}
+			}
+
+			$('#file_path')[0].onchange = uploadFile;
+			parseResult();
+		</script>
+</body>
+
+</html>
