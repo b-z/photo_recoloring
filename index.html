@@ -9,73 +9,70 @@
 </head>
 
 <body>
-	<!-- nav bar -->
-	<nav>
-		<div class="nav-wrapper">
-			<div class="container">
-				<span class="brand-logo">PHOTO RECOLORING</span>
-				<ul id="nav-mobile" class="right hide-on-small-only">
-					<li><a href="">ZHOU BOWEI</a></li>
-				</ul>
+
+	<header>
+		<!-- nav bar -->
+		<nav>
+			<div class="nav-wrapper">
+				<div class="container">
+					<span class="brand-logo">PHOTO RECOLORING</span>
+					<ul id="nav-mobile" class="right hide-on-small-only">
+						<li><a href="">ZHOU BOWEI</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<!-- nav bar end -->
+
+		<a href="https://github.com/b-z/photo_recoloring" class="hide-on-med-and-down">
+			<img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
+			alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
+		</a>
+	</header>
+	<main>
+		<!-- container -->
+		<div class="container">
+
+			<!-- search -->
+			<div id="search" class="section">
+				<h6>UPLOAD FILE</h6>
+
+				<div class="row">
+					<div class="col s12 m8 l8 offset-m2 offset-l2">
+						<form action="#">
+							<div class="file-field input-field">
+								<div class="btn">
+									<input id="file_path" type="file">
+									<span><i class="material-icons">perm_media</i></span>
+								</div>
+
+								<div class="file-path-wrapper">
+									<input class="file-path validate" type="text" placeholder="UPLOAD IMAGE FILE">
+								</div>
+
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<h6 class="source_image_area">THE IMAGE</h6>
+
+				<div class="row source_image_area">
+					<div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4">
+						<canvas class="materialboxed" id="source_image"></canvas>
+					</div>
+				</div>
 			</div>
 		</div>
-	</nav>
-	<!-- nav bar end -->
-	<a href="https://github.com/b-z/photo_recoloring" class="hide-on-med-and-down">
-		<img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
-		alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
-	</a>
-	<!-- container -->
-	<div class="container">
-
-		<!-- search -->
-		<div id="search" class="section">
-			<h6>UPLOAD FILE</h6>
-
-			<div class="row">
-				<div class="col s12 m8 l8 offset-m2 offset-l2">
-					<form action="#">
-						<div class="file-field input-field">
-							<div class="btn">
-								<input id="file_path" type="file">
-								<span><i class="material-icons">perm_media</i></span>
-							</div>
-
-							<div class="file-path-wrapper">
-								<input class="file-path validate" type="text" placeholder="UPLOAD IMAGE FILE">
-							</div>
-
-						</div>
-					</form>
-				</div>
-			</div>
-
-			<h6 class="source_image_area">THE IMAGE</h6>
-
-			<div class="row source_image_area">
-				<div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4">
-					<canvas class="materialboxed" id="source_image"></canvas>
-				</div>
-			</div>
-		</div>
-		<!-- search result -->
-		<!-- <div id="results" class="section">
-			<h6>RESULTS</h6>
-			<div class="row">
-				<div id="results_area">
-
-					<div class="results_col col s12 m4 l4">
-					</div>
-					<div class="results_col col s12 m4 l4">
-					</div>
-					<div class="results_col col s12 m4 l4">
-					</div>
-				</div>
-			</div>-->
-	</div>
-	<!-- container end -->
+		<!-- container end -->
+	</main>
 
 	<!-- footer -->
+	<footer class="footer-copyright">
+		<div class="container">
+			Copyright &copy; 2015 Zhou Bowei. All rights reserved.
+		</div>
+	</footer>
 	<!-- footer end -->
 	<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 	<script type="text/javascript" src="js/materialize.min.js"></script>
@@ -83,7 +80,7 @@
 	<script type="text/javascript" src="js/palette.js"></script>
 	<script>
 		var canv, file, ctx;
-		var img_raw;
+		var img_raw, width, height;
 		$(document).ready(function() {
 			$('.materialboxed').materialbox();
 			$('.modal-trigger').leanModal();
@@ -105,8 +102,8 @@
 			img.src = event.target.result;
 			img.onload = function() {
 				var canv = $('#source_image')[0];
-				canv.width = img.width;
-				canv.height = img.height;
+				width = canv.width = img.width;
+				height = canv.height = img.height;
 				ctx = canv.getContext('2d');
 				ctx.drawImage(img, 0, 0);
 				img_raw = context.getImageData(0, 0, img.width, img.height);
