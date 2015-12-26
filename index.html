@@ -71,10 +71,10 @@
 				<div id="modals" class="row"></div>
 
 				<div id="confirm_change" class="row">
-					<div class="col s3 center-align offset-s3">
+					<div class="col s6 m3 center-align offset-m3">
 						<a class="btn waves-effect waves-light" onclick="Palette.putImage(Palette.img);">RESTORE</a>
 					</div>
-					<div class="col s3 center-align">
+					<div class="col s6 m3 center-align">
 						<a class="btn waves-effect waves-light" onclick="Palette.colorTransform(color_list1, color_list2);Palette.putImage(Palette.img_copy);">CONFIRM CHANGE</a>
 					</div>
 				</div>
@@ -201,16 +201,16 @@
 							<form action="#" class="col s6">\
 								<p class="range-field">\
 									<input type="range" id="range' + i +
-					'_r" min="0" max="255" onmousemove="changeColor(' + i + ');"/>\
+					'_r" min="0" max="255" onmousemove="changeColor(' + i + ');" ontouchmove="changeColor(' + i + ');"/>\
 								</p>\
 								<p class="range-field">\
 									<input type="range" id="range' + i +
-					'_g" min="0" max="255" onmousemove="changeColor(' + i + ');"/>\
+					'_g" min="0" max="255" onmousemove="changeColor(' + i + ');" ontouchmove="changeColor(' + i + ');"/>\
 								</p>\
 								<p class="range-field">\
 									<input type="range" id="range' + i +
 					'_b" min="0" max="255" onmousemove="changeColor(' + i +
-					');"/>\
+					');" ontouchmove="changeColor(' + i + ');"/>\
 								</p>\
 							</form>\
 						</div>\
