@@ -16,8 +16,8 @@
 			<div class="nav-wrapper">
 				<div class="container">
 					<a href="https://github.com/b-z/photo_recoloring">
-					<span class="brand-logo">PHOTO RECOLORING</span>
-				</a>
+						<span class="brand-logo">PHOTO RECOLORING</span>
+					</a>
 					<ul id="nav-mobile" class="right hide-on-small-only">
 						<li><a href="https://github.com/b-z/photo_recoloring">ZHOU BOWEI</a></li>
 					</ul>
@@ -27,8 +27,7 @@
 		<!-- nav bar end -->
 
 		<a href="https://github.com/b-z/photo_recoloring" class="hide-on-med-and-down">
-			<img style="position: absolute; top: 0; right: 0; border: 0;" src="img/github.png"
-			alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
+			<img style="position: absolute; top: 0; right: 0; border: 0;" src="img/github.png" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
 		</a>
 	</header>
 	<main>
@@ -65,8 +64,16 @@
 					</div>
 				</div>
 
-				<div id="palette" class="row source_image_area">
+				<div id="palette" class="row source_image_area"></div>
 
+				<div id="palette_e" class="row"></div>
+
+				<div id="modals" class="row"></div>
+
+				<div id="confirm_change" class="row">
+					<div class="col s12 center-align">
+						<a class="btn waves-effect waves-light" onclick="Palette.colorTransform(color_list1, color_list2);Palette.putImage(Palette.img_copy);">CONFIRM CHANGE</a>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -112,38 +119,150 @@
 				ctx.drawImage(img, 0, 0);
 				img_raw = ctx.getImageData(0, 0, img.width, img.height);
 
-				Palette.init(img_raw);
+				Palette.init(img_raw,ctx);
 				Palette.palette(img_raw.data);
-				var colors=Palette.kmeans();
+				var colors = Palette.kmeans();
 				addPalette(colors);
+				$('#palette_e').hide();
+				$('#confirm_change').hide();
 				$('.source_image_area').fadeIn(1000);
 			}
 		}
 
-		function addPalette(colors){
-			var tmp='';
-			for (var i=1;i<colors.length;i++){
-				tmp+='\
-				<div class="col s1_5'+(i==1?' offset-s2 offset-m2 offset-l2':' ')+' center-align">\
-					<a class="plt'+i+' z-depth-1 btn-thin btn waves-effect waves-light hide-on-med-and-up"></a>\
-					<a class="plt'+i+' z-depth-1 btn-floating btn waves-effect waves-light hide-on-small-only hide-on-large-only"></a>\
-					<a class="plt'+i+' z-depth-1 btn-floating btn-large waves-effect waves-light hide-on-med-and-down"></a>\
+		function addPalette(colors) {
+			var tmp = '',
+				tmp_e = '',
+				modals = '';
+			color_list_rgb=colors;
+			color_list1 = [];
+			for (var i = 0; i < colors.length; i++) {
+				color_list1.push(Color.rgb2lab(colors[i]));
+			}
+			for (var i = 1; i < colors.length; i++) {
+				tmp += '\
+				<div class="col s1_5' + (i == 1 ? ' offset-s2 offset-m2 offset-l2' : ' ') + ' center-align">\
+					<a class="plt' + i + ' z-depth-1 btn-thin btn waves-effect waves-light hide-on-med-and-up"></a>\
+					<a class="plt' + i +
+					' z-depth-1 btn-floating btn waves-effect waves-light hide-on-small-only hide-on-large-only"></a>\
+					<a class="plt' + i + ' z-depth-1 btn-floating btn-large waves-effect waves-light hide-on-med-and-down"></a>\
 				</div>';
+				tmp_e += '\
+				<div class="col s1_5' + (i == 1 ? ' offset-s2 offset-m2 offset-l2' : ' ') + ' center-align">\
+					<a class="plt' + i + '_e z-depth-1 btn-thin btn waves-effect waves-light hide-on-med-and-up"></a>\
+					<a class="plt' + i +
+					'_e z-depth-1 btn-floating btn waves-effect waves-light hide-on-small-only hide-on-large-only"></a>\
+					<a class="plt' + i + '_e z-depth-1 btn-floating btn-large waves-effect waves-light hide-on-med-and-down"></a>\
+					<div class="plt' + i +
+					'_p" style="width:1px;height:1px;"></div>\
+				</div>';
+				modals +=
+					'\
+				<div id="modal' + i + '" class="modal">\
+					<div class="modal-content">\
+						<h4>CHANGE COLOR</h4>\
+						<p>FROM</p>\
+						<div class="row">\
+							<div class="input-field col s6">\
+								<input id="modal' + i +
+					'_ori_txt" type="text" class="validate">\
+								<label class="active" for="modal' + i + '_ori_txt">Origin</label>\
+							</div>\
+							<div class="col s3 modal-color z-depth-1 btn-thin btn waves-effect waves-light" id="modal' + i +
+					'_ori">\
+							</div>\
+						</div>\
+						<p>TO</p>\
+						<div class="row">\
+							<div class="input-field col s6">\
+								<input id="modal' + i +
+					'_dst_txt" type="text" onkeyup="changeColor(' + i +
+					');" class="validate">\
+								<label class="active" for="modal' + i + '_ori_txt">Destination</label>\
+							</div>\
+							<div class="col s3 modal-color z-depth-1 btn-thin btn waves-effect waves-light" id="modal' + i +
+					'_dst" style="display:none;">\
+							</div>\
+						</div>\
+					</div>\
+					<div class="modal-footer">\
+					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" onclick="confirmChange(' + i +
+					');">CONFIRM</a>\
+					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">CANCEL</a>\
+					</div>\
+				</div>'
 			}
+
 			$('#palette').html(tmp);
-			for (var i=1;i<colors.length;i++){
-				var c=colors[i];
-				var color='rgb('+c[0]+','+c[1]+','+c[2]+')';
-				setTimeout((function(j,cl){
-					return function(){
-						$('.plt'+j).attr('style','background-color:'+cl+'!important');
+			$('#palette_e').html(tmp_e);
+			$('#modals').html(modals);
+
+			for (var i = 1; i < colors.length; i++) {
+				var c = colors[i];
+				var color = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+				setTimeout((function(j, cl) {
+					return function() {
+						$('.plt' + j).attr('style', 'background-color:' + cl + '!important');
+						$('.plt' + j + ',.plt' + j).click((function(k, co) {
+							return function() {
+								$('#modal' + j + '_ori,#modal' + j + '_dst').attr('style', 'background-color:' + co + '!important');
+								$('#modal' + j + '_ori_txt,#modal' + j + '_dst_txt').val(co);
+								$('#modal' + j).openModal();
+							}
+						})(j, cl));
 					};
-				})(i,color),800*(0.5+i));
+				})(i, color), 800 * (0.5 + i));
 			}
-			setTimeout(function(){
+			setTimeout(function() {
 				$('#palette').append('<div id="helper" class="col s12 center-align" style="display:none;"><h5>CLICK THE PALETTE TO RECOLOR.</h5></div>');
 				$('#helper').fadeIn(1000);
-			},3000);
+			}, 3000);
+		}
+
+		function changeColor(id) {
+			var color = $('#modal' + id + '_dst_txt').val();
+			$('#modal' + id + '_dst').attr('style', 'background-color:' + color + '!important');
+			$('#modal' + id + '_dst').show();
+		}
+		var color_list_rgb = [];
+		var color_list1 = [];
+		var color_list2 = [];
+		var change_list = [false, false, false, false, false];
+
+		function confirmChange(id) {
+			var color = $('#modal' + id + '_dst_txt').val();
+			if (!color.length || color == $('#modal' + id + '_ori_txt').val()) {
+				change_list[id - 1] = false;
+				return;
+			}
+			change_list[id - 1] = color;
+			var show = false;
+			for (var i = 0; i < change_list.length; i++) {
+				if (change_list[i] != false) {
+					show = true;
+				}
+			}
+			if (show) {
+				$('#palette_e').show();
+				$('#helper').hide();
+				$('#confirm_change').show();
+				color_list2 = [false];
+				for (var i = 0; i < change_list.length; i++) {
+					color_list2.push(Color.txt2lab(change_list[i]));
+					var idx = i + 1;
+					if (change_list[i] != false) {
+						$('.plt' + idx + '_e').show();
+						$('.plt' + idx + '_p').hide();
+						$('.plt' + idx + '_e').attr('style', 'background-color:' + change_list[i] + '!important');
+					} else {
+						$('.plt' + idx + '_e').hide();
+						$('.plt' + idx + '_p').show();
+					}
+				}
+			} else {
+				$('#palette_e').hide();
+				$('#helper').show();
+				$('#confirm_change').hide();
+			}
 		}
 
 		$('#file_path')[0].onchange = uploadFile;

@@ -46,6 +46,7 @@ nav, .brand-logo {
     background-color: #86A8A8!important;
     color: white !important;
     margin: 0;
+    /*max-width:80px;*/
 }
 a {
     color: #88AAA9!important;
@@ -74,4 +75,15 @@ main {
 .btn-thin{
     width:100%;
     padding:0;
+}
+.modal-color{
+    height:43px;
+    max-width:80px;
+    margin-top:14px;
+}
+#palette_e{
+    display: none;
+}
+#confirm_change{
+    display: none;
 }
