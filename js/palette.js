@@ -10,17 +10,7 @@ Palette.init = function(img) {
     this.bin_size = 256 / this.bin_range;
     this.channels = 4;
     this.dataArray = img.data;
-    this.kmeans_iteration = 15;
     this.K = 5;
-    this.kmeans_centers = [];
-
-    for (var i = 0; i < this.K + 1; i++) {
-        this.kmeans_centers.push({
-            color: null,
-            weight: 0,
-            acc: [0, 0, 0]
-        });
-    }
 
     for (var i = 0; i < this.bin_range; i++) {
         for (var j = 0; j < this.bin_range; j++) {
@@ -62,6 +52,22 @@ Palette.distance2 = function(c1, c2) {
     return res;
 }
 
+Palette.add = function(c1,c2) {
+    var res =[];
+    for (var i = 0; i < c1.length; i++) {
+        res.push(c1[i] + c2[i]);
+    }
+    return res;
+}
+
+Palette.sca_mul = function(c,k) {
+    var res =[];
+    for (var i = 0; i < c.length; i++) {
+        res.push(c[i]*k);
+    }
+    return res;
+}
+
 Palette.kmeansFirst = function() {
     var centers = []; //rgb format
     var centers_lab=[];
@@ -93,13 +99,21 @@ Palette.kmeansFirst = function() {
         centers.push(tmp);
         centers_lab.push(Color.rgb2lab(tmp));
     }
-    return centers;
+    return centers_lab;
 }
 
 Palette.kmeans = function() {
-    var no_change = false;
-    for (var it = 0; it < this.kmeans_iteration; it++) {
+    var centers=this.kmeansFirst();//lab
+    var no_change=false;
+    while (!no_change) {
         no_change = true;
+        var sum=[];
+        for (var i=0;i<this.K+1;i++){
+            sum.push({
+                color:[0,0,0],
+                count:0
+            });
+        }
         for (var i = 0; i < this.bin_range; i++) {
             for (var j = 0; j < this.bin_range; j++) {
                 for (var k = 0; k < this.bin_range; k++) {
@@ -111,8 +125,8 @@ Palette.kmeans = function() {
                     var lab = tmp.Lab;
                     var mind = Infinity;
                     var mini = -1;
-                    for (var p = 0; p < this.kmeans_centers.length; i++) {
-                        var d = this.distance2(this.kmeans_centers[p], lab);
+                    for (var p = 0; p < this.K+1; p++) {
+                        var d = this.distance2(centers[p], lab);
                         if (mind > d) {
                             mind = d;
                             mini = p;
@@ -122,13 +136,27 @@ Palette.kmeans = function() {
                         tmp.idx = mini;
                         no_change = false;
                     }
+                    var m=this.sca_mul(tmp.Lab,tmp.count);
+                    sum[mini].color=this.add(sum[mini].color, m);
+                    sum[mini].count+=tmp.count;
                 }
             }
         }
 
-        if (no_change) {
-            break;
+        for (var i=1;i<this.K+1;i++){
+            if (sum[i].count){
+                for (var j=0;j<3;j++){
+                    centers[i][j]=sum[i].color[j]/sum[i].count;
+                }
+            }
         }
-        console.log(it);
+        // console.log(no_change);
     }
+    var centers_rgb=[];
+    for (var i=0;i<this.K+1;i++){
+        centers_rgb.push(Color.lab2rgb(centers[i]));
+        console.log(centers[i]);
+        console.log(centers_rgb[i]);
+    }
+    return centers_rgb;
 }

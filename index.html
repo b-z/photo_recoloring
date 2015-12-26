@@ -114,7 +114,7 @@
 
 				Palette.init(img_raw);
 				Palette.palette(img_raw.data);
-				var colors=Palette.kmeansFirst();
+				var colors=Palette.kmeans();
 				addPalette(colors);
 				$('.source_image_area').fadeIn(1000);
 			}
