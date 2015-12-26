@@ -96,9 +96,56 @@ var Color = {
 				c.push(s[i] - 0);
 			}
 		}
-        return c;
+		return c;
 	},
-    txt2lab: function(str) {
-        return this.rgb2lab(this.txt2rgb(str));
-    }
+	txt2lab: function(str) {
+		return this.rgb2lab(this.txt2rgb(str));
+	},
+	isOutRGB: function(RGB) {
+		for (var i = 0; i < 3; i++) {
+			if (RGB[i] < 0 || RGB[i] > 255) {
+				return true;
+			}
+		}
+		return false;
+	},
+	isOutLab: function(Lab) {
+		return this.isOutRGB(this.lab2rgb(Lab));
+	},
+	isEqual: function(c1, c2) {
+		for (var i = 0; i < c1.length; i++) {
+			if (c1[i] != c2[i]) {
+				return false;
+			}
+		}
+		return true;
+	},
+	labBoundary: function(pin, pout) {
+		var mid = [];
+		for (var i = 0; i < pin.length; i++) {
+			mid.push((pin[i] + pout[i]) / 2);
+		}
+		var RGBin = this.lab2rgb(pin);
+		var RGBout = this.lab2rgb(pout);
+		var RGBmid = this.lab2rgb(mid);
+		if (Palette.distance2(pin,pout)<0.001||this.isEqual(RGBin, RGBout)) {
+			return mid;
+		}
+		if (this.isOutRGB(RGBmid)) {
+			return this.labBoundary(pin, mid);
+		} else {
+			return this.labBoundary(mid, pout);
+		}
+	},
+	labIntersect: function(p1, p2) {
+		if (this.isOutLab(p1)){
+			return p1;
+		}
+		if (this.isOutLab(p2)){
+			return this.labBoundary(p1,p2);
+		}else{
+			return this.labIntersect(p2,Palette.add(p2,Palette.sub(p2,p1)));
+		}
+	}
+
 };

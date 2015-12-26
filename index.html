@@ -71,7 +71,10 @@
 				<div id="modals" class="row"></div>
 
 				<div id="confirm_change" class="row">
-					<div class="col s12 center-align">
+					<div class="col s3 center-align offset-s3">
+						<a class="btn waves-effect waves-light" onclick="Palette.putImage(Palette.img);">RESTORE</a>
+					</div>
+					<div class="col s3 center-align">
 						<a class="btn waves-effect waves-light" onclick="Palette.colorTransform(color_list1, color_list2);Palette.putImage(Palette.img_copy);">CONFIRM CHANGE</a>
 					</div>
 				</div>
@@ -89,6 +92,7 @@
 	<!-- footer end -->
 	<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 	<script type="text/javascript" src="js/materialize.min.js"></script>
+	<script type="text/javascript" src="js/math.min.js"></script>
 	<script type="text/javascript" src="js/color.js"></script>
 	<script type="text/javascript" src="js/palette.js"></script>
 	<script>
@@ -112,6 +116,13 @@
 			var img = new Image();
 			img.src = event.target.result;
 			img.onload = function() {
+				window.color_list_rgb = [];
+				window.color_list1 = [];
+				window.color_list2 = [];
+				window.change_list = [false, false, false, false, false];
+				window.Ls = [];
+				window.Ls_user = [];
+
 				var canv = $('#source_image')[0];
 				width = canv.width = img.width;
 				height = canv.height = img.height;
@@ -119,7 +130,7 @@
 				ctx.drawImage(img, 0, 0);
 				img_raw = ctx.getImageData(0, 0, img.width, img.height);
 
-				Palette.init(img_raw,ctx);
+				Palette.init(img_raw, ctx);
 				Palette.palette(img_raw.data);
 				var colors = Palette.kmeans();
 				addPalette(colors);
@@ -133,11 +144,17 @@
 			var tmp = '',
 				tmp_e = '',
 				modals = '';
-			color_list_rgb=colors;
+			color_list_rgb = colors;
 			color_list1 = [];
+			color_list2 = [];
 			for (var i = 0; i < colors.length; i++) {
-				color_list1.push(Color.rgb2lab(colors[i]));
+				var Lab = Color.rgb2lab(colors[i]);
+				color_list1.push(Lab);
+				color_list2.push(Color.rgb2lab(colors[i]));
+				window.Ls.push(Lab[0]);
+				window.Ls_user.push(Lab[0]);
 			}
+			color_list2[0] = false;
 			for (var i = 1; i < colors.length; i++) {
 				tmp += '\
 				<div class="col s1_5' + (i == 1 ? ' offset-s2 offset-m2 offset-l2' : ' ') + ' center-align">\
@@ -157,10 +174,9 @@
 				</div>';
 				modals +=
 					'\
-				<div id="modal' + i + '" class="modal">\
+				<div id="modal' + i + '" class="modal modal-fixed-footer">\
 					<div class="modal-content">\
 						<h4>CHANGE COLOR</h4>\
-						<p>FROM</p>\
 						<div class="row">\
 							<div class="input-field col s6">\
 								<input id="modal' + i +
@@ -171,23 +187,38 @@
 					'_ori">\
 							</div>\
 						</div>\
-						<p>TO</p>\
 						<div class="row">\
 							<div class="input-field col s6">\
 								<input id="modal' + i +
-					'_dst_txt" type="text" onkeyup="changeColor(' + i +
-					');" class="validate">\
-								<label class="active" for="modal' + i + '_ori_txt">Destination</label>\
+					'_dst_txt" type="text" class="validate">\
+								<label class="active" for="modal' + i + '_dst_txt">Destination</label>\
 							</div>\
 							<div class="col s3 modal-color z-depth-1 btn-thin btn waves-effect waves-light" id="modal' + i +
 					'_dst" style="display:none;">\
 							</div>\
 						</div>\
+						<div class="row">\
+							<form action="#" class="col s6">\
+								<p class="range-field">\
+									<input type="range" id="range' + i +
+					'_r" min="0" max="255" onmousemove="changeColor(' + i + ');"/>\
+								</p>\
+								<p class="range-field">\
+									<input type="range" id="range' + i +
+					'_g" min="0" max="255" onmousemove="changeColor(' + i + ');"/>\
+								</p>\
+								<p class="range-field">\
+									<input type="range" id="range' + i +
+					'_b" min="0" max="255" onmousemove="changeColor(' + i +
+					');"/>\
+								</p>\
+							</form>\
+						</div>\
 					</div>\
 					<div class="modal-footer">\
-					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" onclick="confirmChange(' + i +
+					<a class="modal-action modal-close waves-effect waves-green btn-flat" onclick="confirmChange(' + i +
 					');">CONFIRM</a>\
-					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">CANCEL</a>\
+					<a class="modal-action modal-close waves-effect waves-green btn-flat">CANCEL</a>\
 					</div>\
 				</div>'
 			}
@@ -199,64 +230,84 @@
 			for (var i = 1; i < colors.length; i++) {
 				var c = colors[i];
 				var color = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
-				setTimeout((function(j, cl) {
+				setTimeout((function(j, cl, rgb) {
 					return function() {
 						$('.plt' + j).attr('style', 'background-color:' + cl + '!important');
-						$('.plt' + j + ',.plt' + j).click((function(k, co) {
+						$('.plt' + j + ',.plt' + j + '_e').click((function(k, co, RGB) {
 							return function() {
 								$('#modal' + j + '_ori,#modal' + j + '_dst').attr('style', 'background-color:' + co + '!important');
-								$('#modal' + j + '_ori_txt,#modal' + j + '_dst_txt').val(co);
+								$('#modal' + j + '_ori_txt').val(co);
+								$('#range' + j + '_r').val(RGB[0]);
+								$('#range' + j + '_g').val(RGB[1]);
+								$('#range' + j + '_b').val(RGB[2]);
 								$('#modal' + j).openModal();
 							}
-						})(j, cl));
+						})(j, cl, rgb));
 					};
-				})(i, color), 800 * (0.5 + i));
+				})(i, color, c), 600 * (0.5 + i));
 			}
 			setTimeout(function() {
 				$('#palette').append('<div id="helper" class="col s12 center-align" style="display:none;"><h5>CLICK THE PALETTE TO RECOLOR.</h5></div>');
 				$('#helper').fadeIn(1000);
-			}, 3000);
+			}, 2200);
 		}
 
 		function changeColor(id) {
-			var color = $('#modal' + id + '_dst_txt').val();
+			var r = $('#range' + id + '_r').val();
+			var g = $('#range' + id + '_g').val();
+			var b = $('#range' + id + '_b').val();
+			var color = 'rgb(' + r + ',' + g + ',' + b + ')';
 			$('#modal' + id + '_dst').attr('style', 'background-color:' + color + '!important');
+			$('#modal' + id + '_dst_txt').val(color);
 			$('#modal' + id + '_dst').show();
 		}
-		var color_list_rgb = [];
-		var color_list1 = [];
-		var color_list2 = [];
-		var change_list = [false, false, false, false, false];
 
 		function confirmChange(id) {
-			var color = $('#modal' + id + '_dst_txt').val();
-			if (!color.length || color == $('#modal' + id + '_ori_txt').val()) {
-				change_list[id - 1] = false;
-				return;
+			var R = $('#range' + id + '_r').val();
+			var G = $('#range' + id + '_g').val();
+			var B = $('#range' + id + '_b').val();
+			var color = 'rgb(' + R + ',' + G + ',' + B + ')';
+
+			var show = true;
+
+			var Lab = Color.rgb2lab([R, G, B]);
+			Ls_user[id] = Lab[0];
+			for (var i = 1; i < Ls.length; i++) {
+				Ls[i] = Ls_user[i];
+				color_list2[i][0] = Ls[i];
 			}
-			change_list[id - 1] = color;
-			var show = false;
-			for (var i = 0; i < change_list.length; i++) {
-				if (change_list[i] != false) {
-					show = true;
+			color_list2[id] = Lab;
+			for (var i = 1; i < Ls.length; i++) {
+				if (i < id) {
+					if (Ls[i] > Ls[i + 1]) {
+						Ls[i] = Ls[i + 1];
+						color_list2[i][0] = Ls[i + 1];
+					}
+				}
+				if (i > id) {
+					if (Ls[i] < Ls[i - 1]) {
+						Ls[i] = Ls[i - 1];
+						color_list2[i][0] = Ls[i - 1];
+					}
 				}
 			}
+
+			change_list[id - 1] = color;
+
 			if (show) {
 				$('#palette_e').show();
 				$('#helper').hide();
 				$('#confirm_change').show();
-				color_list2 = [false];
 				for (var i = 0; i < change_list.length; i++) {
-					color_list2.push(Color.txt2lab(change_list[i]));
+					// var t = color_list_rgb[i + 1];
+					// var color1_txt = 'rgb(' + t[0] + ',' + t[1] + ',' + t[2] + ')';
+					// var color2_txt = (change_list[i] == false ? color1_txt : change_list[i])
 					var idx = i + 1;
-					if (change_list[i] != false) {
-						$('.plt' + idx + '_e').show();
-						$('.plt' + idx + '_p').hide();
-						$('.plt' + idx + '_e').attr('style', 'background-color:' + change_list[i] + '!important');
-					} else {
-						$('.plt' + idx + '_e').hide();
-						$('.plt' + idx + '_p').show();
-					}
+					var RGB = Color.lab2rgb(color_list2[idx]);
+					var color2_txt = 'rgb(' + RGB[0] + ',' + RGB[1] + ',' + RGB[2] + ')';
+					$('.plt' + idx + '_e').show();
+					$('.plt' + idx + '_p').hide();
+					$('.plt' + idx + '_e').attr('style', 'background-color:' + color2_txt + '!important');
 				}
 			} else {
 				$('#palette_e').hide();

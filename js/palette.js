@@ -51,10 +51,27 @@ Palette.distance2 = function(c1, c2) {
 	return res;
 }
 
+Palette.normalize = function(v) {
+	var d = Math.sqrt(this.distance2(v, [0, 0, 0]));
+	var res = [];
+	for (var i = 0; i < v.length; i++) {
+		res.push(v[i] / d);
+	}
+	return res;
+}
+
 Palette.add = function(c1, c2) {
 	var res = [];
 	for (var i = 0; i < c1.length; i++) {
 		res.push(c1[i] + c2[i]);
+	}
+	return res;
+}
+
+Palette.sub = function(c1, c2) {
+	var res = [];
+	for (var i = 0; i < c1.length; i++) {
+		res.push(c1[i] - c2[i]);
 	}
 	return res;
 }
@@ -149,20 +166,55 @@ Palette.kmeans = function() {
 				}
 			}
 		}
-		// console.log(no_change);
 	}
+	centers=this.sort(centers);
 	var centers_rgb = [];
 	for (var i = 0; i < this.K + 1; i++) {
 		centers_rgb.push(Color.lab2rgb(centers[i]));
-		// console.log(centers[i]);
-		// console.log(centers_rgb[i]);
 	}
 	return centers_rgb;
 }
 
+Palette.sort=function(colors){
+	var l=colors.length;
+	for (var i=l-1;i>0;i--){
+		for (var j=0;j<i;j++){
+			if (colors[j][0]>colors[j+1][0]){
+				var tmp=colors[j];
+				colors[j]=colors[j+1];
+				colors[j+1]=tmp;
+			}
+		}
+	}
+	return colors;
+}
+
 Palette.colorTransform = function(colors1, colors2) {
+	this.L1=[0];
+	this.L2=[0];
+	for (var i=1;i<colors1.length;i++){
+		this.L1.push(colors1[i][0]);
+		this.L2.push(colors2[i][0]);
+	}
+	this.L1.push(100);
+	this.L2.push(100);
 	var l = this.dataArray.length;
 	var out_array = this.img_copy.data;
+
+	var cs1 = [];
+	var cs2 = [];
+	var k = 0;
+	for (var i = 0; i < this.K + 1; i++) {
+		if (colors2[i] != false) {
+			cs1.push(colors1[i]);
+			cs2.push(colors2[i]);
+			k++;
+		}
+	}
+	this.sigma = this.getSigma(colors1);
+	this.lambda = this.getLambda(cs1);
+	// console.log(this.lambda);
+
 	for (var i = 0; i < l; i += this.channels) {
 		var R = this.dataArray[i];
 		var G = this.dataArray[i + 1];
@@ -170,12 +222,19 @@ Palette.colorTransform = function(colors1, colors2) {
 		var alpha = this.dataArray[i + 3];
 
 		var Lab = Color.rgb2lab([R, G, B]);
-		var L = Lab[0];
-		var a = Lab[1];
-		var b = Lab[2];
-		var out_lab = Lab;
+		var out_lab = [0, 0, 0];
 
-		// TODO: our_lab=transform(colors1,clors2,L,a,b)
+		// TODO: our_lab=transform(cs1,cs2,L,a,b)
+
+		var L = this.colorTransformSingleL(Lab[0]);
+		// console.log(L);
+		for (var p = 0; p < k; p++) {
+			var v = this.colorTransformSingleAB([cs1[p][1],cs1[p][2]], [cs2[p][1],cs2[p][2]], Lab[0], Lab);
+			v[0]=L;
+			var omega = this.omega(cs1, Lab, p);
+			v = this.sca_mul(v, omega);
+			out_lab = this.add(out_lab, v);
+		}
 
 		var out_rgb = Color.lab2rgb(out_lab);
 		out_array[i] = out_rgb[0];
@@ -184,6 +243,84 @@ Palette.colorTransform = function(colors1, colors2) {
 		out_array[i + 3] = alpha;
 	}
 	return out_array;
+}
+
+Palette.colorTransformSingleL = function(l){
+	var i;
+	for (i=0;i<this.L1.length-1;i++){
+		if (l>=this.L1[i]&&l<=this.L1[i+1]){
+			break;
+		}
+	}
+	var l1=this.L1[i];
+	var l2=this.L1[i+1];
+	var s=(l1==l2?1:(l-l1)/(l2-l1));
+	var L1=this.L2[i];
+	var L2=this.L2[i+1];
+	var L=(L2-L1)*s+L1;
+	return L;
+}
+
+Palette.colorTransformSingleAB = function(ab1, ab2, L, x) {
+	var color1 = [L, ab1[0], ab1[1]];
+	var color2 = [L, ab2[0], ab2[1]];
+	if (this.distance2(color1,color2)<0.0001){
+		return color1;
+	}
+	var d = this.sub(color2, color1);
+	var x0 = this.add(x, d);
+	var Cb = Color.labIntersect(color1, color2);
+	// x--->x0
+	var xb;
+	if (Color.isOutLab(x0)) {
+		xb = Color.labBoundary(color2, x0);
+	} else {
+		xb = Color.labIntersect(x, x0);
+	}
+	var dxx = this.distance2(xb, x);
+	var dcc = this.distance2(Cb, color1);
+	var l2 = Math.min(1, dxx / dcc);
+	var xbn = this.normalize(this.sub(xb, x));
+	var x_x = Math.sqrt(this.distance2(color1, color2) * l2);
+	// console.log(x_x);
+	return this.add(x, this.sca_mul(xbn, x_x));
+}
+
+Palette.omega = function(cs1, Lab, i) {
+	var sum = 0;
+	for (var j = 0; j < cs1.length; j++) {
+		sum += this.lambda[j][i] * this.phi(Math.sqrt(this.distance2(cs1[j], Lab)));
+	}
+	return sum;
+}
+
+Palette.getLambda = function(cs1) {
+	var s = [];
+	var k = cs1.length;
+	for (var p = 0; p < k; p++) {
+		var tmp = [];
+		for (var q = 0; q < k; q++) {
+			tmp.push(this.phi(Math.sqrt(this.distance2(cs1[p], cs1[q]))));
+		}
+		s.push(tmp);
+	}
+	var lambda = math.inv(s);
+	return lambda;
+}
+
+Palette.phi = function(r) {
+	return Math.exp(-r * r / (2 * this.sigma * this.sigma));
+}
+
+Palette.getSigma = function(colors) {
+	var sum = 0;
+	for (var i = 0; i < this.K + 1; i++) {
+		for (var j = 0; j < this.K + 1; j++) {
+			if (i == j) continue;
+			sum += Math.sqrt(this.distance2(colors[i], colors[j]));
+		}
+	}
+	return sum / (this.K * (this.K + 1));
 }
 
 Palette.putImage = function(img) {
