@@ -93,17 +93,14 @@ Palette.kmeansFirst = function() {
 	for (var i in this.bins) {
 		bins_copy[i] = this.bins[i].count;
 	}
-	// console.log(bins_copy);
 
 	for (var p = 0; p < this.K; p++) {
 		var tmp;
 		var maxc = -1;
 		for (var i in bins_copy) {
-			//    if (p > 0) {
 			var d2 = this.distance2(this.bins[i].Lab, centers_lab[p]);
 			var factor = 1 - Math.exp(-d2 / 6400); // sigma_a:80
 			bins_copy[i] *= factor;
-			//    }
 			if (bins_copy[i] > maxc) {
 				maxc = bins_copy[i];
 				tmp = [];
@@ -167,7 +164,7 @@ Palette.kmeans = function() {
 			}
 		}
 	}
-	centers=this.sort(centers);
+	centers = this.sort(centers);
 	var centers_rgb = [];
 	for (var i = 0; i < this.K + 1; i++) {
 		centers_rgb.push(Color.lab2rgb(centers[i]));
@@ -175,14 +172,14 @@ Palette.kmeans = function() {
 	return centers_rgb;
 }
 
-Palette.sort=function(colors){
-	var l=colors.length;
-	for (var i=l-1;i>0;i--){
-		for (var j=0;j<i;j++){
-			if (colors[j][0]>colors[j+1][0]){
-				var tmp=colors[j];
-				colors[j]=colors[j+1];
-				colors[j+1]=tmp;
+Palette.sort = function(colors) {
+	var l = colors.length;
+	for (var i = l - 1; i > 0; i--) {
+		for (var j = 0; j < i; j++) {
+			if (colors[j][0] > colors[j + 1][0]) {
+				var tmp = colors[j];
+				colors[j] = colors[j + 1];
+				colors[j + 1] = tmp;
 			}
 		}
 	}
@@ -190,9 +187,9 @@ Palette.sort=function(colors){
 }
 
 Palette.colorTransform = function(colors1, colors2) {
-	this.L1=[0];
-	this.L2=[0];
-	for (var i=1;i<colors1.length;i++){
+	this.L1 = [0];
+	this.L2 = [0];
+	for (var i = 1; i < colors1.length; i++) {
 		this.L1.push(colors1[i][0]);
 		this.L2.push(colors2[i][0]);
 	}
@@ -229,8 +226,8 @@ Palette.colorTransform = function(colors1, colors2) {
 		var L = this.colorTransformSingleL(Lab[0]);
 		// console.log(L);
 		for (var p = 0; p < k; p++) {
-			var v = this.colorTransformSingleAB([cs1[p][1],cs1[p][2]], [cs2[p][1],cs2[p][2]], Lab[0], Lab);
-			v[0]=L;
+			var v = this.colorTransformSingleAB([cs1[p][1], cs1[p][2]], [cs2[p][1], cs2[p][2]], Lab[0], Lab);
+			v[0] = L;
 			var omega = this.omega(cs1, Lab, p);
 			v = this.sca_mul(v, omega);
 			out_lab = this.add(out_lab, v);
@@ -245,26 +242,26 @@ Palette.colorTransform = function(colors1, colors2) {
 	return out_array;
 }
 
-Palette.colorTransformSingleL = function(l){
+Palette.colorTransformSingleL = function(l) {
 	var i;
-	for (i=0;i<this.L1.length-1;i++){
-		if (l>=this.L1[i]&&l<=this.L1[i+1]){
+	for (i = 0; i < this.L1.length - 1; i++) {
+		if (l >= this.L1[i] && l <= this.L1[i + 1]) {
 			break;
 		}
 	}
-	var l1=this.L1[i];
-	var l2=this.L1[i+1];
-	var s=(l1==l2?1:(l-l1)/(l2-l1));
-	var L1=this.L2[i];
-	var L2=this.L2[i+1];
-	var L=(L2-L1)*s+L1;
+	var l1 = this.L1[i];
+	var l2 = this.L1[i + 1];
+	var s = (l1 == l2 ? 1 : (l - l1) / (l2 - l1));
+	var L1 = this.L2[i];
+	var L2 = this.L2[i + 1];
+	var L = (L2 - L1) * s + L1;
 	return L;
 }
 
 Palette.colorTransformSingleAB = function(ab1, ab2, L, x) {
 	var color1 = [L, ab1[0], ab1[1]];
 	var color2 = [L, ab2[0], ab2[1]];
-	if (this.distance2(color1,color2)<0.0001){
+	if (this.distance2(color1, color2) < 0.0001) {
 		return color1;
 	}
 	var d = this.sub(color2, color1);
