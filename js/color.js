@@ -138,9 +138,6 @@ var Color = {
 		}
 	},
 	labIntersect: function(p1, p2) {
-		if (this.isOutLab(p1)){
-			return p1;
-		}
 		if (this.isOutLab(p2)){
 			return this.labBoundary(p1,p2);
 		}else{
